@@ -1,0 +1,11 @@
+---
+  parser: "babel-eslint"
+
+  globals:
+    afterEach: false
+    assert: false
+    beforeEach: false
+    describe: false
+    expect: false
+    it: false
+    sinon: false
