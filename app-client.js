@@ -4,7 +4,7 @@ import { Router, Route, IndexRoute, browserHistory } from 'react-router';
 
 import App from './src/app';
 import Home from './src/home';
-import About from './src/game';
+import Game from './src/game';
 
 ReactDOM.render((
     <Router history={ browserHistory }>

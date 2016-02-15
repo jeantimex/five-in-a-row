@@ -64,9 +64,9 @@
 
 	var _home2 = _interopRequireDefault(_home);
 
-	var _about = __webpack_require__(496);
+	var _game = __webpack_require__(496);
 
-	var _about2 = _interopRequireDefault(_about);
+	var _game2 = _interopRequireDefault(_game);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -77,7 +77,7 @@
 	        _reactRouter.Route,
 	        { path: '/', component: _app2.default },
 	        _react2.default.createElement(_reactRouter.IndexRoute, { component: _home2.default }),
-	        _react2.default.createElement(_reactRouter.Route, { path: '/about', component: _about2.default })
+	        _react2.default.createElement(_reactRouter.Route, { path: '/game', component: _game2.default })
 	    )
 	), document.getElementById('react-container'));
 
@@ -66850,7 +66850,7 @@
 	            });
 
 	            if (players.length >= 2 && (this.isPlayer() || this.isWatcher())) {
-	                _reactRouter.browserHistory.push('/about');
+	                _reactRouter.browserHistory.push('/game');
 	            }
 	        }
 	    }, {
@@ -67110,30 +67110,30 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var About = function (_Component) {
-	    _inherits(About, _Component);
+	var Game = function (_Component) {
+	    _inherits(Game, _Component);
 
-	    function About() {
-	        _classCallCheck(this, About);
+	    function Game(props) {
+	        _classCallCheck(this, Game);
 
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(About).apply(this, arguments));
+	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Game).call(this, props));
 	    }
 
-	    _createClass(About, [{
+	    _createClass(Game, [{
 	        key: 'render',
 	        value: function render() {
 	            return _react2.default.createElement(
 	                'div',
 	                null,
-	                'About'
+	                'Game'
 	            );
 	        }
 	    }]);
 
-	    return About;
+	    return Game;
 	}(_react.Component);
 
-	exports.default = About;
+	exports.default = Game;
 
 /***/ }
 /******/ ]);
