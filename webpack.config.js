@@ -4,14 +4,15 @@ module.exports = {
     filename: 'public/bundle.js'
   },
   module: {
-    loaders: [
-      {
-        exclude: /(node_modules|app-server.js)/,
-        loader: 'babel',
-        query: {
-          presets: ['es2015', 'react']
-        }
+    loaders: [{
+      exclude: /(node_modules|app-server.js)/,
+      loader: 'babel',
+      query: {
+        presets: ['es2015', 'react']
       }
-    ]
+    }, {
+      test: /\.css$/,
+      loader: 'style!css'
+    }]
   }
 };

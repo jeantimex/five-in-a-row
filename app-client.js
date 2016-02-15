@@ -1,13 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Router, Route, hashHistory } from 'react-router';
+import { Router, Route, IndexRoute, browserHistory } from 'react-router';
+
 import App from './src/app';
-import Join from './src/modules/join';
+import Home from './src/home';
+import About from './src/game';
 
 ReactDOM.render((
-    <Router history={ hashHistory }>
+    <Router history={ browserHistory }>
         <Route path="/" component={ App }>
-            <Route path="/join" component={ Join } />
+            <IndexRoute component={ Home } />
+            <Route path="/game" component={ Game } />
         </Route>
     </Router>
 ), document.getElementById('react-container'));
