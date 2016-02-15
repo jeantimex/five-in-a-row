@@ -23,15 +23,26 @@ class App extends Component {
             status: 'disconnected',
             dlgTitle: '',
             dlgContent: '',
-            dlgOpen: false
+            dlgOpen: false,
+            players: [],
+            watchers: []
         };
 
         // Needed for onTouchTap
         // Can go away when react 1.0 release
         injectTapEventPlugin();
+    }
 
+    componentWillMount() {
         // Initialize socket
         this.initSocket();
+    }
+
+    componentWillUnmount() {
+        this.socket.off('connect');
+        this.socket.off('disconnect');
+        this.socket.off('throw');
+        this.socket.off('updateConnection');
     }
 
     initSocket() {
@@ -39,6 +50,7 @@ class App extends Component {
         this.socket.on('connect', this.connect.bind(this));
         this.socket.on('disconnect', this.disconnect.bind(this));
         this.socket.on('throw', this.onError.bind(this));
+        this.socket.on('updateConnection', this.updateConnection.bind(this));
     }
 
     // -------------------------------
@@ -63,13 +75,67 @@ class App extends Component {
         });
     }
 
+    updateConnection(connections) {
+        console.log('update connections');
+        console.log(connections);
+        const { players, watchers } = connections;
+
+        this.setState({
+            players,
+            watchers
+        });
+    }
+
     handleDlgClose() {
         this.setState({ dlgOpen: false });
     }
 
+    getCurrentUser() {
+        const { players, watchers } = this.state;
+        const socketId = this.socket.id;
+        const playerIndex = players.findIndex(function (player) { return player.id === socketId });
+        const watcherIndex = watchers.findIndex(function (watcher) { return watcher.id === socketId });
+        
+        if (playerIndex < 0 && watcherIndex < 0) {
+            return {
+                color: -1,
+                name: '',
+                isPlayer: false,
+                isWatcher: false,
+                isWaiting: false
+            };
+        }
+
+        if (playerIndex >= 0) {
+            const player = players[playerIndex];
+
+            return {
+                color: player.color,
+                name: player.name,
+                isPlayer: true,
+                isWatcher: false,
+                isWaiting: players.length === 1
+            };
+        } else {
+            const watcher = watchers[watcherIndex];
+
+            return {
+                color: watcher.color,
+                name: watcher.name,
+                isPlayer: false,
+                isWatcher: true,
+                isWaiting: false
+            };
+        }
+    }
+
+    emit(eventName, payload) {
+        this.socket.emit(eventName, payload);
+    }
+
     render() {
         const { children } = this.props;
-        const { title } = this.state;
+        const { title, players, watchers } = this.state;
 
         const actions = [
             <FlatButton
@@ -82,7 +148,10 @@ class App extends Component {
 
         var childrenWithProps = React.Children.map(children, (child) => {
             return React.cloneElement(child, {
-                socket: this.socket
+                emit: this.emit.bind(this),
+                players,
+                watchers,
+                user: this.getCurrentUser()
             });
         });
 

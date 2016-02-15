@@ -22,42 +22,26 @@ class Home extends Component {
 
         this.state = {
             errorText: '',
-            nameFieldValue: '',
-            isWaiting: false,
-            players: [],
-            watchers: []
+            nameFieldValue: ''
         };
     }
 
     componentWillMount() {
-        // Initialize socket
-        this.initSocket();
+        this.checkProps(this.props);
     }
 
-    componentWillUnmount() {
-        this.socket.off('updateConnection');
+    componentWillReceiveProps(props) {
+        this.checkProps(props);
     }
 
-    initSocket() {
-        this.socket = this.props.socket;
-        this.socket.on('updateConnection', this.updateConnection.bind(this));
-    }
-
-    // -------------------------------
-    //  Server Socket Event Handlers
-    // -------------------------------
-
-    updateConnection(connections) {
-        console.log('update connections');
-        console.log(connections);
-        const { players, watchers } = connections;
+    checkProps(props) {
+        const { players, user } = props;
 
         this.setState({
-            players,
-            watchers
+
         });
 
-        if (players.length >= 2 && (this.isPlayer() || this.isWatcher())) {
+        if (players.length >= 2 && (user.isPlayer || user.isWatcher)) {
             browserHistory.push('/game');
         }
     }
@@ -69,6 +53,7 @@ class Home extends Component {
     }
 
     join(color) {
+        const { emit } = this.props;
         const { nameFieldValue } = this.state;
 
         if (nameFieldValue.length === 0) {
@@ -78,41 +63,29 @@ class Home extends Component {
             return;
         }
         
-        this.socket.emit('join', {
-            color,
-            name: nameFieldValue
-        });
-
-        this.setState({
-            isWaiting: true
-        });
-    }
-
-    isPlayer() {
-        const { players } = this.state;
-        const sid = this.socket.id;
-        return players.findIndex(function (player) { return player.id === sid }) >= 0;
-    }
-
-    isWatcher() {
-        const { watchers } = this.state;
-        const sid = this.socket.id;
-        return watchers.findIndex(function (watcher) { return watcher.id === sid }) >= 0;
+        if (emit) {
+            emit('join', {
+                color,
+                name: nameFieldValue
+            });
+        }
     }
 
     isPicked(color) {
-        return this.state.players.findIndex(function (player) { return player.color === color }) >= 0;
+        const { players } = this.props;
+        return players.findIndex(function (player) { return player.color === color }) >= 0;
     }
 
     render() {
-        const { errorText, isWaiting, players, watchers } = this.state;
+        const { players, user } = this.props;
+        const { errorText } = this.state;
 
         const chessOptionClassName = cx('options', {
-            hidden: players.length >= 2 || this.isPlayer()
+            hidden: players.length >= 2 || user.isPlayer
         });
 
         const watchOptionClassName = cx('options', {
-            hidden: players.length < 2 || this.isPlayer()
+            hidden: players.length < 2 || user.isPlayer
         });
 
         const isBlackPicked = this.isPicked(0);
@@ -121,13 +94,15 @@ class Home extends Component {
         return (
             <div className='home-container'>
                 {/* Name field */}
+                { !user.isWaiting &&
                 <TextField
                     hintText='Enter your name'
                     errorText={ errorText }
                     onChange={ this.onNameFieldChange.bind(this) }
                 />
+                }
 
-                { isWaiting && <CircularProgress /> }
+                { user.isWaiting && <CircularProgress /> }
 
                 {/* Select chess piece color */}
                 <div className={ chessOptionClassName }>
@@ -163,7 +138,16 @@ class Home extends Component {
 }
 
 Home.propTypes = {
-    socket: PropTypes.object
+    emit: PropTypes.func,
+    players: PropTypes.array,
+    watchers: PropTypes.array,
+    user: PropTypes.object
+};
+
+Home.defaultProps = {
+    socketId: '',
+    players: [],
+    watchers: []
 };
 
 export default Home;

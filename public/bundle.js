@@ -24785,25 +24785,39 @@
 	            status: 'disconnected',
 	            dlgTitle: '',
 	            dlgContent: '',
-	            dlgOpen: false
+	            dlgOpen: false,
+	            players: [],
+	            watchers: []
 	        };
 
 	        // Needed for onTouchTap
 	        // Can go away when react 1.0 release
 	        (0, _reactTapEventPlugin2.default)();
-
-	        // Initialize socket
-	        _this.initSocket();
 	        return _this;
 	    }
 
 	    _createClass(App, [{
+	        key: 'componentWillMount',
+	        value: function componentWillMount() {
+	            // Initialize socket
+	            this.initSocket();
+	        }
+	    }, {
+	        key: 'componentWillUnmount',
+	        value: function componentWillUnmount() {
+	            this.socket.off('connect');
+	            this.socket.off('disconnect');
+	            this.socket.off('throw');
+	            this.socket.off('updateConnection');
+	        }
+	    }, {
 	        key: 'initSocket',
 	        value: function initSocket() {
 	            this.socket = (0, _socket2.default)('http://localhost:3000');
 	            this.socket.on('connect', this.connect.bind(this));
 	            this.socket.on('disconnect', this.disconnect.bind(this));
 	            this.socket.on('throw', this.onError.bind(this));
+	            this.socket.on('updateConnection', this.updateConnection.bind(this));
 	        }
 
 	        // -------------------------------
@@ -24832,9 +24846,75 @@
 	            });
 	        }
 	    }, {
+	        key: 'updateConnection',
+	        value: function updateConnection(connections) {
+	            console.log('update connections');
+	            console.log(connections);
+	            var players = connections.players;
+	            var watchers = connections.watchers;
+
+
+	            this.setState({
+	                players: players,
+	                watchers: watchers
+	            });
+	        }
+	    }, {
 	        key: 'handleDlgClose',
 	        value: function handleDlgClose() {
 	            this.setState({ dlgOpen: false });
+	        }
+	    }, {
+	        key: 'getCurrentUser',
+	        value: function getCurrentUser() {
+	            var _state = this.state;
+	            var players = _state.players;
+	            var watchers = _state.watchers;
+
+	            var socketId = this.socket.id;
+	            var playerIndex = players.findIndex(function (player) {
+	                return player.id === socketId;
+	            });
+	            var watcherIndex = watchers.findIndex(function (watcher) {
+	                return watcher.id === socketId;
+	            });
+
+	            if (playerIndex < 0 && watcherIndex < 0) {
+	                return {
+	                    color: -1,
+	                    name: '',
+	                    isPlayer: false,
+	                    isWatcher: false,
+	                    isWaiting: false
+	                };
+	            }
+
+	            if (playerIndex >= 0) {
+	                var player = players[playerIndex];
+
+	                return {
+	                    color: player.color,
+	                    name: player.name,
+	                    isPlayer: true,
+	                    isWatcher: false,
+	                    isWaiting: players.length === 1
+	                };
+	            } else {
+	                var watcher = watchers[watcherIndex];
+
+	                return {
+	                    color: watcher.color,
+	                    name: watcher.name,
+	                    isPlayer: false,
+	                    isWatcher: true,
+	                    isWaiting: false
+	                };
+	            }
+	        }
+	    }, {
+	        key: 'emit',
+	        value: function emit(eventName, payload) {
+	            this.socket.emit(eventName, payload);
 	        }
 	    }, {
 	        key: 'render',
@@ -24842,7 +24922,10 @@
 	            var _this2 = this;
 
 	            var children = this.props.children;
-	            var title = this.state.title;
+	            var _state2 = this.state;
+	            var title = _state2.title;
+	            var players = _state2.players;
+	            var watchers = _state2.watchers;
 
 
 	            var actions = [_react2.default.createElement(_flatButton2.default, {
@@ -24854,7 +24937,10 @@
 
 	            var childrenWithProps = _react2.default.Children.map(children, function (child) {
 	                return _react2.default.cloneElement(child, {
-	                    socket: _this2.socket
+	                    emit: _this2.emit.bind(_this2),
+	                    players: players,
+	                    watchers: watchers,
+	                    user: _this2.getCurrentUser()
 	                });
 	            });
 
@@ -66805,10 +66891,7 @@
 
 	        _this.state = {
 	            errorText: '',
-	            nameFieldValue: '',
-	            isWaiting: false,
-	            players: [],
-	            watchers: []
+	            nameFieldValue: ''
 	        };
 	        return _this;
 	    }
@@ -66816,40 +66899,23 @@
 	    _createClass(Home, [{
 	        key: 'componentWillMount',
 	        value: function componentWillMount() {
-	            // Initialize socket
-	            this.initSocket();
+	            this.checkProps(this.props);
 	        }
 	    }, {
-	        key: 'componentWillUnmount',
-	        value: function componentWillUnmount() {
-	            this.socket.off('updateConnection');
+	        key: 'componentWillReceiveProps',
+	        value: function componentWillReceiveProps(props) {
+	            this.checkProps(props);
 	        }
 	    }, {
-	        key: 'initSocket',
-	        value: function initSocket() {
-	            this.socket = this.props.socket;
-	            this.socket.on('updateConnection', this.updateConnection.bind(this));
-	        }
-
-	        // -------------------------------
-	        //  Server Socket Event Handlers
-	        // -------------------------------
-
-	    }, {
-	        key: 'updateConnection',
-	        value: function updateConnection(connections) {
-	            console.log('update connections');
-	            console.log(connections);
-	            var players = connections.players;
-	            var watchers = connections.watchers;
+	        key: 'checkProps',
+	        value: function checkProps(props) {
+	            var players = props.players;
+	            var user = props.user;
 
 
-	            this.setState({
-	                players: players,
-	                watchers: watchers
-	            });
+	            this.setState({});
 
-	            if (players.length >= 2 && (this.isPlayer() || this.isWatcher())) {
+	            if (players.length >= 2 && (user.isPlayer || user.isWatcher)) {
 	                _reactRouter.browserHistory.push('/game');
 	            }
 	        }
@@ -66863,6 +66929,7 @@
 	    }, {
 	        key: 'join',
 	        value: function join(color) {
+	            var emit = this.props.emit;
 	            var nameFieldValue = this.state.nameFieldValue;
 
 
@@ -66873,58 +66940,37 @@
 	                return;
 	            }
 
-	            this.socket.emit('join', {
-	                color: color,
-	                name: nameFieldValue
-	            });
-
-	            this.setState({
-	                isWaiting: true
-	            });
-	        }
-	    }, {
-	        key: 'isPlayer',
-	        value: function isPlayer() {
-	            var players = this.state.players;
-
-	            var sid = this.socket.id;
-	            return players.findIndex(function (player) {
-	                return player.id === sid;
-	            }) >= 0;
-	        }
-	    }, {
-	        key: 'isWatcher',
-	        value: function isWatcher() {
-	            var watchers = this.state.watchers;
-
-	            var sid = this.socket.id;
-	            return watchers.findIndex(function (watcher) {
-	                return watcher.id === sid;
-	            }) >= 0;
+	            if (emit) {
+	                emit('join', {
+	                    color: color,
+	                    name: nameFieldValue
+	                });
+	            }
 	        }
 	    }, {
 	        key: 'isPicked',
 	        value: function isPicked(color) {
-	            return this.state.players.findIndex(function (player) {
+	            var players = this.props.players;
+
+	            return players.findIndex(function (player) {
 	                return player.color === color;
 	            }) >= 0;
 	        }
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _state = this.state;
-	            var errorText = _state.errorText;
-	            var isWaiting = _state.isWaiting;
-	            var players = _state.players;
-	            var watchers = _state.watchers;
+	            var _props = this.props;
+	            var players = _props.players;
+	            var user = _props.user;
+	            var errorText = this.state.errorText;
 
 
 	            var chessOptionClassName = (0, _classnames2.default)('options', {
-	                hidden: players.length >= 2 || this.isPlayer()
+	                hidden: players.length >= 2 || user.isPlayer
 	            });
 
 	            var watchOptionClassName = (0, _classnames2.default)('options', {
-	                hidden: players.length < 2 || this.isPlayer()
+	                hidden: players.length < 2 || user.isPlayer
 	            });
 
 	            var isBlackPicked = this.isPicked(0);
@@ -66933,12 +66979,12 @@
 	            return _react2.default.createElement(
 	                'div',
 	                { className: 'home-container' },
-	                _react2.default.createElement(_textField2.default, {
+	                !user.isWaiting && _react2.default.createElement(_textField2.default, {
 	                    hintText: 'Enter your name',
 	                    errorText: errorText,
 	                    onChange: this.onNameFieldChange.bind(this)
 	                }),
-	                isWaiting && _react2.default.createElement(_circularProgress2.default, null),
+	                user.isWaiting && _react2.default.createElement(_circularProgress2.default, null),
 	                _react2.default.createElement(
 	                    'div',
 	                    { className: chessOptionClassName },
@@ -66983,7 +67029,16 @@
 	}(_react.Component);
 
 	Home.propTypes = {
-	    socket: _react.PropTypes.object
+	    emit: _react.PropTypes.func,
+	    players: _react.PropTypes.array,
+	    watchers: _react.PropTypes.array,
+	    user: _react.PropTypes.object
+	};
+
+	Home.defaultProps = {
+	    socketId: '',
+	    players: [],
+	    watchers: []
 	};
 
 	exports.default = Home;
@@ -67102,6 +67157,12 @@
 
 	var _react2 = _interopRequireDefault(_react);
 
+	var _reactRouter = __webpack_require__(159);
+
+	var _classnames = __webpack_require__(493);
+
+	var _classnames2 = _interopRequireDefault(_classnames);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -67116,10 +67177,35 @@
 	    function Game(props) {
 	        _classCallCheck(this, Game);
 
-	        return _possibleConstructorReturn(this, Object.getPrototypeOf(Game).call(this, props));
+	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Game).call(this, props));
+
+	        _this.state = {};
+	        return _this;
 	    }
 
 	    _createClass(Game, [{
+	        key: 'componentWillMount',
+	        value: function componentWillMount() {
+	            this.checkConnection(this.props);
+	        }
+	    }, {
+	        key: 'componentWillReceiveProps',
+	        value: function componentWillReceiveProps(props) {
+	            this.checkConnection(props);
+	        }
+	    }, {
+	        key: 'checkConnection',
+	        value: function checkConnection(props) {
+	            var players = props.players;
+	            var isPlayer = props.isPlayer;
+	            var isWatcher = props.isWatcher;
+
+
+	            if (players.length < 2) {
+	                _reactRouter.browserHistory.push('/');
+	            }
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            return _react2.default.createElement(
