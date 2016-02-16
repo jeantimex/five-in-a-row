@@ -24773,7 +24773,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var IP = '172.18.112.205';
+	var IP = 'localhost';
 	var PORT = 3000;
 
 	var App = function (_Component) {
@@ -24786,9 +24786,12 @@
 
 	        _this.state = {
 	            status: 'disconnected',
+	            // Dialog state
 	            dlgTitle: '',
 	            dlgContent: '',
 	            dlgOpen: false,
+	            // Game states
+	            isFinished: false,
 	            players: [],
 	            watchers: [],
 	            board: [],
@@ -24875,11 +24878,13 @@
 	            console.log(gameData);
 	            var board = gameData.board;
 	            var currentColor = gameData.currentColor;
+	            var isFinished = gameData.isFinished;
 
 
 	            this.setState({
 	                board: board,
-	                currentColor: currentColor
+	                currentColor: currentColor,
+	                isFinished: isFinished
 	            });
 	        }
 	    }, {
@@ -24923,7 +24928,7 @@
 
 	            if (playerIndex < 0 && watcherIndex < 0) {
 	                return {
-	                    color: -1,
+	                    color: -2,
 	                    name: '',
 	                    isPlayer: false,
 	                    isWatcher: false,
@@ -24972,6 +24977,7 @@
 	            var players = _state2.players;
 	            var watchers = _state2.watchers;
 	            var board = _state2.board;
+	            var isFinished = _state2.isFinished;
 
 
 	            var actions = [_react2.default.createElement(_flatButton2.default, {
@@ -24987,7 +24993,8 @@
 	                    user: _this2.getCurrentUser(),
 	                    players: players,
 	                    watchers: watchers,
-	                    board: board
+	                    board: board,
+	                    isFinished: isFinished
 	                });
 	            });
 
@@ -67260,11 +67267,10 @@
 	        key: 'checkConnection',
 	        value: function checkConnection(props) {
 	            var players = props.players;
-	            var isPlayer = props.isPlayer;
-	            var isWatcher = props.isWatcher;
+	            var user = props.user;
 
 
-	            if (players.length < 2) {
+	            if (players.length < 2 || !user.isPlayer && !user.isWatcher) {
 	                _reactRouter.browserHistory.push('/');
 	            }
 	        }
@@ -67326,7 +67332,9 @@
 	    }, {
 	        key: 'quit',
 	        value: function quit(e) {
-	            var emit = this.props.emit;
+	            var _props2 = this.props;
+	            var emit = _props2.emit;
+	            var user = _props2.user;
 
 
 	            if (emit) {
@@ -67336,9 +67344,10 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
-	            var _props2 = this.props;
-	            var user = _props2.user;
-	            var board = _props2.board;
+	            var _props3 = this.props;
+	            var user = _props3.user;
+	            var board = _props3.board;
+	            var isFinished = _props3.isFinished;
 	            var _state = this.state;
 	            var targetX = _state.targetX;
 	            var targetY = _state.targetY;
@@ -67369,7 +67378,7 @@
 	                    _react2.default.createElement(
 	                        'div',
 	                        { className: 'grid' },
-	                        user.canMove && _react2.default.createElement(
+	                        !isFinished && user.canMove && _react2.default.createElement(
 	                            'div',
 	                            { className: 'target', style: targetStyle },
 	                            _react2.default.createElement(_cropFree2.default, null)
@@ -67389,7 +67398,7 @@
 	                        { className: 'chess-container' },
 	                        chesses
 	                    ),
-	                    user.canMove && _react2.default.createElement('div', {
+	                    !isFinished && user.canMove && _react2.default.createElement('div', {
 	                        className: 'grid-overlay',
 	                        onMouseMove: this.onMouseMove.bind(this),
 	                        onClick: this.onClick.bind(this)
@@ -67417,7 +67426,8 @@
 	    watchers: _react.PropTypes.array,
 	    user: _react.PropTypes.object,
 	    board: _react.PropTypes.array,
-	    currentColor: _react.PropTypes.number
+	    currentColor: _react.PropTypes.number,
+	    isFinished: _react.PropTypes.bool
 	};
 
 	Game.defaultProps = {
@@ -67425,7 +67435,8 @@
 	    players: [],
 	    watchers: [],
 	    board: [],
-	    currentColor: 0
+	    currentColor: 0,
+	    isFinished: false
 	};
 
 	exports.default = Game;

@@ -18,6 +18,7 @@ function GameServer() {
     this.connections = [];
     this.board = [];
     this.currentColor = 0;
+    this.isFinished = false;
 }
 
 GameServer.prototype = {
@@ -25,6 +26,7 @@ GameServer.prototype = {
     init: function() {
         this.board = [];
         this.currentColor = 0;
+        this.isFinished = false;
 
         for (var i = 0; i < BOARD_SIZE; i++) {
             this.board.push([]);
@@ -35,7 +37,7 @@ GameServer.prototype = {
         }
 
         for (var i = 0; i < this.connections.length; i++) {
-            this.connections[i].color = -1;
+            this.connections[i].color = -2;
         }
     },
 
@@ -120,7 +122,7 @@ GameServer.prototype = {
             this.connections.splice(idx, 1);
 
             // If a player disconnected, reset the game
-            if (connection.color > -1) {
+            if (connection.color >= 0) {
                 this.init();
             }
         }
@@ -145,7 +147,7 @@ GameServer.prototype = {
         var arr = [];
         for (var i = 0; i < this.connections.length; i++) {
             var conn = this.connections[i];
-            if (conn.color < 0) {
+            if (conn.color === -1) {
                 arr.push({ id: conn.socket.id.substr(2), color: conn.color, name: conn.name });
             }
         }
@@ -172,12 +174,23 @@ GameServer.prototype = {
     getGameData: function() {
         return {
             board: this.board,
-            currentColor: this.currentColor
+            currentColor: this.currentColor,
+            isFinished: this.isFinished
         };
     },
 
     quit: function(id) {
-        this.init();
+        var idx = this.connections.findIndex(function (conn) { return conn.socket.id === id });
+
+        if (idx > -1) {
+            var connection = this.connections[idx];
+
+            if (connection.color >= 0) {
+                this.init();
+            } else {
+                connection.color = -2;
+            }
+        }
     }
 };
 
@@ -205,7 +218,7 @@ io.sockets.on('connect', function (socket) {
         var name = payload.name;
 
         // Sanity check
-        if (color > -1 && game.isColorPicked(color)) {
+        if (color >= 0 && game.isColorPicked(color)) {
             socket.emit('throw', { message: (color ? 'White' : 'Black') + ' is picked' });
             return;
         }
@@ -219,17 +232,15 @@ io.sockets.on('connect', function (socket) {
     socket.on('move', function (payload) {
         game.move(payload.row, payload.col, payload.color, socket.id.substr(2));
 
-        io.sockets.emit('updateGame', game.getGameData());
-
         if (game.hasWinner(payload.row, payload.col, payload.color)) {
-            console.log('winner');
+            game.isFinished = true;
             io.sockets.emit('hasWinner', { name: game.getConnectionName(socket.id) });
-            return;
+        } else if (game.isBoardFull()) {
+            game.isFinished = true;
+            io.sockets.emit('boardFull');
         }
 
-        if (game.isBoardFull()) {
-            io.sockets.emit('boardFull', {});
-        }
+        io.sockets.emit('updateGame', game.getGameData());
     });
 
     socket.on('quit', function () {

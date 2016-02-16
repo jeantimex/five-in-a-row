@@ -24,9 +24,12 @@ class App extends Component {
 
         this.state = {
             status: 'disconnected',
+            // Dialog state
             dlgTitle: '',
             dlgContent: '',
             dlgOpen: false,
+            // Game states
+            isFinished: false,
             players: [],
             watchers: [],
             board: [],
@@ -98,11 +101,12 @@ class App extends Component {
     updateGame(gameData) {
         console.log('update game data');
         console.log(gameData);
-        const { board, currentColor } = gameData;
+        const { board, currentColor, isFinished } = gameData;
 
         this.setState({
             board,
-            currentColor
+            currentColor,
+            isFinished
         });
     }
 
@@ -134,7 +138,7 @@ class App extends Component {
         
         if (playerIndex < 0 && watcherIndex < 0) {
             return {
-                color: -1,
+                color: -2,
                 name: '',
                 isPlayer: false,
                 isWatcher: false,
@@ -174,7 +178,7 @@ class App extends Component {
 
     render() {
         const { children } = this.props;
-        const { title, players, watchers, board } = this.state;
+        const { title, players, watchers, board, isFinished } = this.state;
 
         const actions = [
             <FlatButton
@@ -191,7 +195,8 @@ class App extends Component {
                 user: this.getCurrentUser(),
                 players,
                 watchers,
-                board
+                board,
+                isFinished
             });
         });
 

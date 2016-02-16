@@ -32,9 +32,9 @@ class Game extends Component {
     }
 
     checkConnection(props) {
-        const { players, isPlayer, isWatcher } = props;
+        const { players, user } = props;
 
-        if (players.length < 2) {
+        if (players.length < 2 || (!user.isPlayer && !user.isWatcher)) {
             browserHistory.push('/');
         }
     }
@@ -80,7 +80,7 @@ class Game extends Component {
     }
 
     quit(e) {
-        const { emit } = this.props;
+        const { emit, user } = this.props;
 
         if (emit) {
             emit('quit');
@@ -88,7 +88,7 @@ class Game extends Component {
     }
 
     render() {
-        const { user, board } = this.props;
+        const { user, board, isFinished } = this.props;
         const { targetX, targetY, isTargetHidden } = this.state;
         const targetStyle = { left: targetX, top: targetY };
 
@@ -112,7 +112,7 @@ class Game extends Component {
             <div className='game-container'>
                 <div className='game-board'>
                     <div className='grid'>
-                        { user.canMove && 
+                        { !isFinished && user.canMove && 
                         <div className='target' style={ targetStyle }>
                             <TargetIcon />
                         </div>
@@ -128,7 +128,7 @@ class Game extends Component {
                     <div className='chess-container'>
                         { chesses }
                     </div>
-                    { user.canMove &&
+                    { !isFinished && user.canMove &&
                     <div
                         className='grid-overlay'
                         onMouseMove={ this.onMouseMove.bind(this) }
@@ -156,7 +156,8 @@ Game.propTypes = {
     watchers: PropTypes.array,
     user: PropTypes.object,
     board: PropTypes.array,
-    currentColor: PropTypes.number
+    currentColor: PropTypes.number,
+    isFinished: PropTypes.bool,
 };
 
 Game.defaultProps = {
@@ -164,7 +165,8 @@ Game.defaultProps = {
     players: [],
     watchers: [],
     board: [],
-    currentColor: 0
+    currentColor: 0,
+    isFinished: false
 };
 
 export default Game;
