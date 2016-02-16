@@ -3,7 +3,9 @@ var app = express();
 
 app.use(express.static('./public'));
 
-var server = app.listen(3000, '0.0.0.0');
+var ip = '0.0.0.0';
+var port = 3000;
+var server = app.listen(port, ip);
 var io = require('socket.io').listen(server);
 
 var title = 'Untitled Presentation';
@@ -256,4 +258,4 @@ io.sockets.on('connect', function (socket) {
 
 });
 
-console.log('Server is running at http://localhost:3000');
+console.log('Server is running at http://' + ip + ':' + port);
