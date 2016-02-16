@@ -23,6 +23,63 @@
     transition-duration: 0.15s;
 }
 
+.game-board .point-container {
+    position: absolute;
+    width: 407px;
+    height: 407px;
+    background: transparent;
+}
+
+.game-board .point-container .p0 {
+    position: absolute;
+    top: 199px;
+    left: 199px;
+    background-color: #CCCCCC;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.game-board .point-container .p1 {
+    position: absolute;
+    top: 83px;
+    left: 83px;
+    background-color: #CCCCCC;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.game-board .point-container .p2 {
+    position: absolute;
+    top: 83px;
+    left: 315px;
+    background-color: #CCCCCC;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.game-board .point-container .p3 {
+    position: absolute;
+    top: 315px;
+    left: 83px;
+    background-color: #CCCCCC;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.game-board .point-container .p4 {
+    position: absolute;
+    top: 315px;
+    left: 315px;
+    background-color: #CCCCCC;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
 .game-board .grid-overlay {
     position: absolute;
     width: 407px;

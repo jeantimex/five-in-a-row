@@ -109,6 +109,13 @@ class Game extends Component {
                         </div>
                         }
                     </div>
+                    <div className='point-container'>
+                        <div className='p0'></div>
+                        <div className='p1'></div>
+                        <div className='p2'></div>
+                        <div className='p3'></div>
+                        <div className='p4'></div>
+                    </div>
                     <div className='chess-container'>
                         { chesses }
                     </div>
