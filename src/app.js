@@ -209,26 +209,8 @@ class App extends Component {
         return (
             <div>
                 <AppBar
-                    title='Five in a Row'
+                    title='Gomoku (Five in a Row)'
                     iconElementLeft={ <IconButton><AppIcon /></IconButton> }
-                    iconElementRight={
-                        <IconMenu
-                            iconButtonElement={
-                                <IconButton><MenuIcon /></IconButton>
-                            }
-                            targetOrigin={ { horizontal: 'right', vertical: 'top' } }
-                            anchorOrigin={ { horizontal: 'right', vertical: 'top' } }
-                        >
-                            <MenuItem
-                                linkButton
-                                containerElement={ <Link to="/" /> }
-                                primaryText='Home' />
-                            <MenuItem
-                                linkButton
-                                containerElement={ <Link to="/about" /> }
-                                primaryText='About' />
-                      </IconMenu>
-                    }
                 />
 
                 <Dialog
