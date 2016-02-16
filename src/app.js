@@ -14,6 +14,9 @@ import FlatButton from 'material-ui/lib/flat-button';
 
 import './styles/app.css';
 
+const IP = 'localhost';
+const PORT = 3000;
+
 class App extends Component {
 
     constructor(props) {
@@ -45,15 +48,18 @@ class App extends Component {
         this.socket.off('disconnect');
         this.socket.off('throw');
         this.socket.off('updateConnection');
+        this.socket.off('updateGame');
+        this.socket.off('hasWinner');
     }
 
     initSocket() {
-        this.socket = io('http://localhost:3000');
+        this.socket = io('http://' + IP + ':' + PORT);
         this.socket.on('connect', this.connect.bind(this));
         this.socket.on('disconnect', this.disconnect.bind(this));
         this.socket.on('throw', this.onError.bind(this));
         this.socket.on('updateConnection', this.updateConnection.bind(this));
         this.socket.on('updateGame', this.updateGame.bind(this));
+        this.socket.on('hasWinner', this.hasWinner.bind(this));
     }
 
     // -------------------------------
@@ -100,8 +106,24 @@ class App extends Component {
         });
     }
 
+    hasWinner(winner) {
+        const user = this.getCurrentUser();
+
+        if (user.isPlayer || user.isWatcher) {
+            this.openDlg('Winner is ' + winner.name, '');
+        }
+    }
+
     handleDlgClose() {
         this.setState({ dlgOpen: false });
+    }
+
+    openDlg(title, content) {
+        this.setState({
+            dlgTitle: title,
+            dlgContent: content,
+            dlgOpen: true
+        });
     }
 
     getCurrentUser() {
@@ -152,7 +174,7 @@ class App extends Component {
 
     render() {
         const { children } = this.props;
-        const { title, players, watchers, board, currentColor } = this.state;
+        const { title, players, watchers, board } = this.state;
 
         const actions = [
             <FlatButton
@@ -166,9 +188,9 @@ class App extends Component {
         var childrenWithProps = React.Children.map(children, (child) => {
             return React.cloneElement(child, {
                 emit: this.emit.bind(this),
+                user: this.getCurrentUser(),
                 players,
                 watchers,
-                user: this.getCurrentUser(),
                 board
             });
         });

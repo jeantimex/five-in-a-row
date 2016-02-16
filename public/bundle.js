@@ -24773,6 +24773,9 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	var IP = 'localhost';
+	var PORT = 3000;
+
 	var App = function (_Component) {
 	    _inherits(App, _Component);
 
@@ -24811,16 +24814,19 @@
 	            this.socket.off('disconnect');
 	            this.socket.off('throw');
 	            this.socket.off('updateConnection');
+	            this.socket.off('updateGame');
+	            this.socket.off('hasWinner');
 	        }
 	    }, {
 	        key: 'initSocket',
 	        value: function initSocket() {
-	            this.socket = (0, _socket2.default)('http://localhost:3000');
+	            this.socket = (0, _socket2.default)('http://' + IP + ':' + PORT);
 	            this.socket.on('connect', this.connect.bind(this));
 	            this.socket.on('disconnect', this.disconnect.bind(this));
 	            this.socket.on('throw', this.onError.bind(this));
 	            this.socket.on('updateConnection', this.updateConnection.bind(this));
 	            this.socket.on('updateGame', this.updateGame.bind(this));
+	            this.socket.on('hasWinner', this.hasWinner.bind(this));
 	        }
 
 	        // -------------------------------
@@ -24877,9 +24883,27 @@
 	            });
 	        }
 	    }, {
+	        key: 'hasWinner',
+	        value: function hasWinner(winner) {
+	            var user = this.getCurrentUser();
+
+	            if (user.isPlayer || user.isWatcher) {
+	                this.openDlg('Winner is ' + winner.name, '');
+	            }
+	        }
+	    }, {
 	        key: 'handleDlgClose',
 	        value: function handleDlgClose() {
 	            this.setState({ dlgOpen: false });
+	        }
+	    }, {
+	        key: 'openDlg',
+	        value: function openDlg(title, content) {
+	            this.setState({
+	                dlgTitle: title,
+	                dlgContent: content,
+	                dlgOpen: true
+	            });
 	        }
 	    }, {
 	        key: 'getCurrentUser',
@@ -24948,7 +24972,6 @@
 	            var players = _state2.players;
 	            var watchers = _state2.watchers;
 	            var board = _state2.board;
-	            var currentColor = _state2.currentColor;
 
 
 	            var actions = [_react2.default.createElement(_flatButton2.default, {
@@ -24961,9 +24984,9 @@
 	            var childrenWithProps = _react2.default.Children.map(children, function (child) {
 	                return _react2.default.cloneElement(child, {
 	                    emit: _this2.emit.bind(_this2),
+	                    user: _this2.getCurrentUser(),
 	                    players: players,
 	                    watchers: watchers,
-	                    user: _this2.getCurrentUser(),
 	                    board: board
 	                });
 	            });
@@ -67216,8 +67239,7 @@
 
 	        _this.state = {
 	            targetX: 0,
-	            targetY: 0,
-	            isTargetHidden: true
+	            targetY: 0
 	        };
 	        return _this;
 	    }
@@ -67270,7 +67292,7 @@
 	            targetX -= ICON_SIZE / 2;
 	            targetY -= ICON_SIZE / 2;
 
-	            this.setState({ targetX: targetX, targetY: targetY, isTargetHidden: false });
+	            this.setState({ targetX: targetX, targetY: targetY });
 	        }
 	    }, {
 	        key: 'onClick',
@@ -67278,6 +67300,7 @@
 	            var _props = this.props;
 	            var emit = _props.emit;
 	            var user = _props.user;
+	            var board = _props.board;
 
 	            var _getTargetPosition2 = this.getTargetPosition(e);
 
@@ -67285,14 +67308,17 @@
 	            var targetY = _getTargetPosition2.targetY;
 
 
-	            console.log(targetX / CELL_SIZE, targetY / CELL_SIZE);
+	            var row = targetY / CELL_SIZE;
+	            var col = targetX / CELL_SIZE;
 
-	            if (emit) {
-	                emit('move', {
-	                    row: targetY / CELL_SIZE,
-	                    col: targetX / CELL_SIZE,
-	                    color: user.color
-	                });
+	            if (board[row][col] === -1) {
+	                if (emit) {
+	                    emit('move', {
+	                        row: row,
+	                        col: col,
+	                        color: user.color
+	                    });
+	                }
 	            }
 	        }
 	    }, {
@@ -67306,7 +67332,6 @@
 	            var targetY = _state.targetY;
 	            var isTargetHidden = _state.isTargetHidden;
 
-	            var targetClassName = (0, _classnames2.default)('target', { hidden: isTargetHidden });
 	            var targetStyle = { left: targetX, top: targetY };
 
 	            var chesses = [];
@@ -67334,7 +67359,7 @@
 	                        { className: 'grid' },
 	                        user.canMove && _react2.default.createElement(
 	                            'div',
-	                            { className: targetClassName, style: targetStyle },
+	                            { className: 'target', style: targetStyle },
 	                            _react2.default.createElement(_cropFree2.default, null)
 	                        )
 	                    ),

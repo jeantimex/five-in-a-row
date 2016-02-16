@@ -18,8 +18,7 @@ class Game extends Component {
 
         this.state = {
             targetX: 0,
-            targetY: 0,
-            isTargetHidden: true
+            targetY: 0
         };
     }
 
@@ -58,28 +57,30 @@ class Game extends Component {
         targetX -= ICON_SIZE / 2;
         targetY -= ICON_SIZE / 2;
 
-        this.setState({ targetX, targetY, isTargetHidden: false });
+        this.setState({ targetX, targetY });
     }
 
     onClick(e) {
-        const { emit, user } = this.props;
+        const { emit, user, board } = this.props;
         const { targetX, targetY } = this.getTargetPosition(e);
 
-        console.log(targetX / CELL_SIZE, targetY / CELL_SIZE);
+        const row = targetY / CELL_SIZE;
+        const col = targetX / CELL_SIZE;
 
-        if (emit) {
-            emit('move', {
-                row: targetY / CELL_SIZE,
-                col: targetX / CELL_SIZE,
-                color: user.color
-            });
+        if (board[row][col] === -1) {
+            if (emit) {
+                emit('move', {
+                    row,
+                    col,
+                    color: user.color
+                });
+            }
         }
     }
 
     render() {
         const { user, board } = this.props;
         const { targetX, targetY, isTargetHidden } = this.state;
-        const targetClassName = cx('target', { hidden: isTargetHidden });
         const targetStyle = { left: targetX, top: targetY };
 
         let chesses = [];
@@ -103,7 +104,7 @@ class Game extends Component {
                 <div className='game-board'>
                     <div className='grid'>
                         { user.canMove && 
-                        <div className={ targetClassName } style={ targetStyle }>
+                        <div className='target' style={ targetStyle }>
                             <TargetIcon />
                         </div>
                         }
