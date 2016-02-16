@@ -1,12 +1,14 @@
 .game-container {
     margin: 0 auto;
-    width: 600px;
-    height: 600px;
-    padding-top: 50px;
+    width: 500px;
+    position: relative;
+    padding: 40px;
 }
 
 .game-board {
     position: relative;
+    width: 407px;
+    height: 407px;
 }
 
 .game-board .grid {
@@ -106,4 +108,8 @@
 
 .chess-white {
     background-color: #FFFFFF;
+}
+
+.button-group {
+    padding: 20px;
 }

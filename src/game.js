@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from  'react';
 import { browserHistory } from 'react-router';
 import TargetIcon from 'material-ui/lib/svg-icons/image/crop-free';
+import RaisedButton from 'material-ui/lib/raised-button';
 
 import cx from 'classnames';
 
@@ -78,6 +79,14 @@ class Game extends Component {
         }
     }
 
+    quit(e) {
+        const { emit } = this.props;
+
+        if (emit) {
+            emit('quit');
+        }
+    }
+
     render() {
         const { user, board } = this.props;
         const { targetX, targetY, isTargetHidden } = this.state;
@@ -127,6 +136,13 @@ class Game extends Component {
                     >
                     </div>
                     }
+                </div>
+                <div className='button-group'>
+                    <RaisedButton
+                        label='Quit'
+                        secondary={true}
+                        onMouseDown={ this.quit.bind(this) }
+                    />
                 </div>
             </div>
         );

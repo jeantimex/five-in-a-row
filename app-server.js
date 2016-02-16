@@ -174,6 +174,10 @@ GameServer.prototype = {
             board: this.board,
             currentColor: this.currentColor
         };
+    },
+
+    quit: function(id) {
+        this.init();
     }
 };
 
@@ -226,6 +230,11 @@ io.sockets.on('connect', function (socket) {
         if (game.isBoardFull()) {
             io.sockets.emit('boardFull', {});
         }
+    });
+
+    socket.on('quit', function () {
+        game.quit(socket.id);
+        io.sockets.emit('updateConnection', game.getConnections());
     });
 
     // -----------------------------------

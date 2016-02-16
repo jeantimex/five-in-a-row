@@ -24773,7 +24773,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var IP = 'localhost';
+	var IP = '172.18.112.205';
 	var PORT = 3000;
 
 	var App = function (_Component) {
@@ -67208,6 +67208,10 @@
 
 	var _cropFree2 = _interopRequireDefault(_cropFree);
 
+	var _raisedButton = __webpack_require__(454);
+
+	var _raisedButton2 = _interopRequireDefault(_raisedButton);
+
 	var _classnames = __webpack_require__(493);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
@@ -67320,6 +67324,16 @@
 	            }
 	        }
 	    }, {
+	        key: 'quit',
+	        value: function quit(e) {
+	            var emit = this.props.emit;
+
+
+	            if (emit) {
+	                emit('quit');
+	            }
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            var _props2 = this.props;
@@ -67379,6 +67393,15 @@
 	                        className: 'grid-overlay',
 	                        onMouseMove: this.onMouseMove.bind(this),
 	                        onClick: this.onClick.bind(this)
+	                    })
+	                ),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'button-group' },
+	                    _react2.default.createElement(_raisedButton2.default, {
+	                        label: 'Quit',
+	                        secondary: true,
+	                        onMouseDown: this.quit.bind(this)
 	                    })
 	                )
 	            );
@@ -67487,7 +67510,7 @@
 
 
 	// module
-	exports.push([module.id, ".game-container {\n    margin: 0 auto;\n    width: 600px;\n    height: 600px;\n    padding-top: 50px;\n}\n\n.game-board {\n    position: relative;\n}\n\n.game-board .grid {\n    width: 407px;\n    height: 407px;\n    background-image: repeating-linear-gradient(0deg, transparent, transparent 28px, #CCC 28px, #CCC 29px), repeating-linear-gradient(-90deg, transparent, transparent 28px,#CCC 28px, #CCC 29px);\n    background-size: 29px 29px;\n    position: absolute;\n}\n\n.game-board .grid .target {\n    position: absolute;\n    transition-property: top, left;\n    transition-duration: 0.15s;\n}\n\n.game-board .point-container {\n    position: absolute;\n    width: 407px;\n    height: 407px;\n    background: transparent;\n}\n\n.game-board .point-container .p0 {\n    position: absolute;\n    top: 199px;\n    left: 199px;\n    background-color: #CCCCCC;\n    width: 8px;\n    height: 8px;\n    border-radius: 50%;\n}\n\n.game-board .point-container .p1 {\n    position: absolute;\n    top: 83px;\n    left: 83px;\n    background-color: #CCCCCC;\n    width: 8px;\n    height: 8px;\n    border-radius: 50%;\n}\n\n.game-board .point-container .p2 {\n    position: absolute;\n    top: 83px;\n    left: 315px;\n    background-color: #CCCCCC;\n    width: 8px;\n    height: 8px;\n    border-radius: 50%;\n}\n\n.game-board .point-container .p3 {\n    position: absolute;\n    top: 315px;\n    left: 83px;\n    background-color: #CCCCCC;\n    width: 8px;\n    height: 8px;\n    border-radius: 50%;\n}\n\n.game-board .point-container .p4 {\n    position: absolute;\n    top: 315px;\n    left: 315px;\n    background-color: #CCCCCC;\n    width: 8px;\n    height: 8px;\n    border-radius: 50%;\n}\n\n.game-board .grid-overlay {\n    position: absolute;\n    width: 407px;\n    height: 407px;\n    background: transparent;\n}\n\n.game-board .chess-container {\n    position: absolute;\n    width: 407px;\n    height: 407px;\n    background: transparent;\n}\n\n.game-board .chess-container .chess {\n    position: absolute;\n    border: 1px solid #000000;\n    border-radius: 50%;\n}\n\n.chess-black {\n    background-color: #000000;\n}\n\n.chess-white {\n    background-color: #FFFFFF;\n}", ""]);
+	exports.push([module.id, ".game-container {\n    margin: 0 auto;\n    width: 500px;\n    position: relative;\n    padding: 40px;\n}\n\n.game-board {\n    position: relative;\n    width: 407px;\n    height: 407px;\n}\n\n.game-board .grid {\n    width: 407px;\n    height: 407px;\n    background-image: repeating-linear-gradient(0deg, transparent, transparent 28px, #CCC 28px, #CCC 29px), repeating-linear-gradient(-90deg, transparent, transparent 28px,#CCC 28px, #CCC 29px);\n    background-size: 29px 29px;\n    position: absolute;\n}\n\n.game-board .grid .target {\n    position: absolute;\n    transition-property: top, left;\n    transition-duration: 0.15s;\n}\n\n.game-board .point-container {\n    position: absolute;\n    width: 407px;\n    height: 407px;\n    background: transparent;\n}\n\n.game-board .point-container .p0 {\n    position: absolute;\n    top: 199px;\n    left: 199px;\n    background-color: #CCCCCC;\n    width: 8px;\n    height: 8px;\n    border-radius: 50%;\n}\n\n.game-board .point-container .p1 {\n    position: absolute;\n    top: 83px;\n    left: 83px;\n    background-color: #CCCCCC;\n    width: 8px;\n    height: 8px;\n    border-radius: 50%;\n}\n\n.game-board .point-container .p2 {\n    position: absolute;\n    top: 83px;\n    left: 315px;\n    background-color: #CCCCCC;\n    width: 8px;\n    height: 8px;\n    border-radius: 50%;\n}\n\n.game-board .point-container .p3 {\n    position: absolute;\n    top: 315px;\n    left: 83px;\n    background-color: #CCCCCC;\n    width: 8px;\n    height: 8px;\n    border-radius: 50%;\n}\n\n.game-board .point-container .p4 {\n    position: absolute;\n    top: 315px;\n    left: 315px;\n    background-color: #CCCCCC;\n    width: 8px;\n    height: 8px;\n    border-radius: 50%;\n}\n\n.game-board .grid-overlay {\n    position: absolute;\n    width: 407px;\n    height: 407px;\n    background: transparent;\n}\n\n.game-board .chess-container {\n    position: absolute;\n    width: 407px;\n    height: 407px;\n    background: transparent;\n}\n\n.game-board .chess-container .chess {\n    position: absolute;\n    border: 1px solid #000000;\n    border-radius: 50%;\n}\n\n.chess-black {\n    background-color: #000000;\n}\n\n.chess-white {\n    background-color: #FFFFFF;\n}\n\n.button-group {\n    padding: 20px;\n}", ""]);
 
 	// exports
 
