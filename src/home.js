@@ -98,7 +98,12 @@ class Home extends Component {
                 />
                 }
 
-                { user.isWaiting && <CircularProgress /> }
+                { user.isWaiting && 
+                <div>
+                    <p>Waiting for a challenger...</p>
+                    <CircularProgress />
+                </div>
+                }
 
                 {/* Select chess piece color */}
                 <div className={ chessOptionClassName }>
