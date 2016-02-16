@@ -53,6 +53,7 @@ class App extends Component {
         this.socket.off('updateConnection');
         this.socket.off('updateGame');
         this.socket.off('hasWinner');
+        this.socket.off('boardFull');
     }
 
     initSocket() {
@@ -63,6 +64,7 @@ class App extends Component {
         this.socket.on('updateConnection', this.updateConnection.bind(this));
         this.socket.on('updateGame', this.updateGame.bind(this));
         this.socket.on('hasWinner', this.hasWinner.bind(this));
+        this.socket.on('boardFull', this.onBoardFull.bind(this));
     }
 
     // -------------------------------
@@ -116,6 +118,10 @@ class App extends Component {
         if (user.isPlayer || user.isWatcher) {
             this.openDlg('Winner is ' + winner.name, '');
         }
+    }
+
+    onBoardFull() {
+        this.openDlg('No winner', 'Please quit and start a new game.');
     }
 
     handleDlgClose() {

@@ -24819,6 +24819,7 @@
 	            this.socket.off('updateConnection');
 	            this.socket.off('updateGame');
 	            this.socket.off('hasWinner');
+	            this.socket.off('boardFull');
 	        }
 	    }, {
 	        key: 'initSocket',
@@ -24830,6 +24831,7 @@
 	            this.socket.on('updateConnection', this.updateConnection.bind(this));
 	            this.socket.on('updateGame', this.updateGame.bind(this));
 	            this.socket.on('hasWinner', this.hasWinner.bind(this));
+	            this.socket.on('boardFull', this.onBoardFull.bind(this));
 	        }
 
 	        // -------------------------------
@@ -24895,6 +24897,11 @@
 	            if (user.isPlayer || user.isWatcher) {
 	                this.openDlg('Winner is ' + winner.name, '');
 	            }
+	        }
+	    }, {
+	        key: 'onBoardFull',
+	        value: function onBoardFull() {
+	            this.openDlg('No winner', 'Please quit and start a new game.');
 	        }
 	    }, {
 	        key: 'handleDlgClose',
