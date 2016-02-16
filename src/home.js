@@ -37,10 +37,6 @@ class Home extends Component {
     checkProps(props) {
         const { players, user } = props;
 
-        this.setState({
-
-        });
-
         if (players.length >= 2 && (user.isPlayer || user.isWatcher)) {
             browserHistory.push('/game');
         }

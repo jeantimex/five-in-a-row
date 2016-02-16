@@ -66960,8 +66960,6 @@
 	            var user = props.user;
 
 
-	            this.setState({});
-
 	            if (players.length >= 2 && (user.isPlayer || user.isWatcher)) {
 	                _reactRouter.browserHistory.push('/game');
 	            }

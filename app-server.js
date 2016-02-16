@@ -24,6 +24,7 @@ GameServer.prototype = {
 
     init: function() {
         this.board = [];
+        this.currentColor = 0;
 
         for (var i = 0; i < BOARD_SIZE; i++) {
             this.board.push([]);
@@ -31,6 +32,10 @@ GameServer.prototype = {
             for (var j = 0; j < BOARD_SIZE; j++) {
                 this.board[i].push(-1);
             }
+        }
+
+        for (var i = 0; i < this.connections.length; i++) {
+            this.connections[i].color = -1;
         }
     },
 
@@ -109,8 +114,15 @@ GameServer.prototype = {
         var idx = this.connections.findIndex(function (conn) { return conn.socket.id === id });
 
         if (idx > -1) {
-            this.connections[idx].socket.disconnect();
+            var connection = this.connections[idx];
+
+            connection.socket.disconnect();
             this.connections.splice(idx, 1);
+
+            // If a player disconnected, reset the game
+            if (connection.color > -1) {
+                this.init();
+            }
         }
     },
 
