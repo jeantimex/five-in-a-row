@@ -12,11 +12,32 @@ var title = 'Untitled Presentation';
 //  Game Server Data
 // -----------------------------------
 
+var BOARD_SIZE = 15;
+
 function GameServer() {
     this.connections = [];
+    this.board = [];
+    this.currentColor = 0;
 }
 
 GameServer.prototype = {
+
+    init: function() {
+        this.board = [];
+
+        for (var i = 0; i < BOARD_SIZE; i++) {
+            this.board.push([]);
+
+            for (var j = 0; j < BOARD_SIZE; j++) {
+                this.board[i].push(-1);
+            }
+        }
+    },
+
+    move: function(row, col, color) {
+        this.board[row][col] = color;
+        this.currentColor = 1 - this.currentColor;
+    },
     
     addConnection: function(connection) {
         console.log('add connection: %s', connection.socket.id);
@@ -70,10 +91,18 @@ GameServer.prototype = {
             players: this.getPlayers(),
             watchers: this.getWatchers()
         };
+    },
+
+    getGameData: function() {
+        return {
+            board: this.board,
+            currentColor: this.currentColor
+        };
     }
 };
 
 var game = new GameServer();
+game.init();
 
 // -----------------------------------
 //  Socket.io
@@ -104,6 +133,13 @@ io.sockets.on('connect', function (socket) {
         game.addConnection({ socket: socket, color: color, name: name });
 
         io.sockets.emit('updateConnection', game.getConnections());
+        io.sockets.emit('updateGame', game.getGameData());
+    });
+
+    socket.on('move', function (payload) {
+        game.move(payload.row, payload.col, payload.color);
+
+        io.sockets.emit('updateGame', game.getGameData());
     });
 
     // -----------------------------------

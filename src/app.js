@@ -25,7 +25,9 @@ class App extends Component {
             dlgContent: '',
             dlgOpen: false,
             players: [],
-            watchers: []
+            watchers: [],
+            board: [],
+            currentColor: 0
         };
 
         // Needed for onTouchTap
@@ -51,6 +53,7 @@ class App extends Component {
         this.socket.on('disconnect', this.disconnect.bind(this));
         this.socket.on('throw', this.onError.bind(this));
         this.socket.on('updateConnection', this.updateConnection.bind(this));
+        this.socket.on('updateGame', this.updateGame.bind(this));
     }
 
     // -------------------------------
@@ -86,12 +89,23 @@ class App extends Component {
         });
     }
 
+    updateGame(gameData) {
+        console.log('update game data');
+        console.log(gameData);
+        const { board, currentColor } = gameData;
+
+        this.setState({
+            board,
+            currentColor
+        });
+    }
+
     handleDlgClose() {
         this.setState({ dlgOpen: false });
     }
 
     getCurrentUser() {
-        const { players, watchers } = this.state;
+        const { players, watchers, currentColor } = this.state;
         const socketId = this.socket.id;
         const playerIndex = players.findIndex(function (player) { return player.id === socketId });
         const watcherIndex = watchers.findIndex(function (watcher) { return watcher.id === socketId });
@@ -102,7 +116,8 @@ class App extends Component {
                 name: '',
                 isPlayer: false,
                 isWatcher: false,
-                isWaiting: false
+                isWaiting: false,
+                canMove: false
             };
         }
 
@@ -114,7 +129,8 @@ class App extends Component {
                 name: player.name,
                 isPlayer: true,
                 isWatcher: false,
-                isWaiting: players.length === 1
+                isWaiting: players.length === 1,
+                canMove: player.color === currentColor
             };
         } else {
             const watcher = watchers[watcherIndex];
@@ -124,7 +140,8 @@ class App extends Component {
                 name: watcher.name,
                 isPlayer: false,
                 isWatcher: true,
-                isWaiting: false
+                isWaiting: false,
+                canMove: false
             };
         }
     }
@@ -135,7 +152,7 @@ class App extends Component {
 
     render() {
         const { children } = this.props;
-        const { title, players, watchers } = this.state;
+        const { title, players, watchers, board, currentColor } = this.state;
 
         const actions = [
             <FlatButton
@@ -151,7 +168,8 @@ class App extends Component {
                 emit: this.emit.bind(this),
                 players,
                 watchers,
-                user: this.getCurrentUser()
+                user: this.getCurrentUser(),
+                board
             });
         });
 

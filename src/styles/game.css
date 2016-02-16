@@ -1,0 +1,52 @@
+.game-container {
+    margin: 0 auto;
+    width: 600px;
+    height: 600px;
+    padding-top: 50px;
+}
+
+.game-board {
+    position: relative;
+}
+
+.game-board .grid {
+    width: 407px;
+    height: 407px;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 28px, #CCC 28px, #CCC 29px), repeating-linear-gradient(-90deg, transparent, transparent 28px,#CCC 28px, #CCC 29px);
+    background-size: 29px 29px;
+    position: absolute;
+}
+
+.game-board .grid .target {
+    position: absolute;
+    transition-property: top, left;
+    transition-duration: 0.15s;
+}
+
+.game-board .grid-overlay {
+    position: absolute;
+    width: 407px;
+    height: 407px;
+    background: transparent;
+}
+
+.game-board .chess-container {
+    position: absolute;
+    width: 407px;
+    height: 407px;
+    background: transparent;
+}
+
+.game-board .chess-container .chess {
+    position: absolute;
+    border: 1px solid #000000;
+    border-radius: 50%;
+}
+
+.chess-black {
+    background-color: #000000;
+}
+
+.chess-white {
+    background-color: #FFFFFF;
+}

@@ -24787,7 +24787,9 @@
 	            dlgContent: '',
 	            dlgOpen: false,
 	            players: [],
-	            watchers: []
+	            watchers: [],
+	            board: [],
+	            currentColor: 0
 	        };
 
 	        // Needed for onTouchTap
@@ -24818,6 +24820,7 @@
 	            this.socket.on('disconnect', this.disconnect.bind(this));
 	            this.socket.on('throw', this.onError.bind(this));
 	            this.socket.on('updateConnection', this.updateConnection.bind(this));
+	            this.socket.on('updateGame', this.updateGame.bind(this));
 	        }
 
 	        // -------------------------------
@@ -24860,6 +24863,20 @@
 	            });
 	        }
 	    }, {
+	        key: 'updateGame',
+	        value: function updateGame(gameData) {
+	            console.log('update game data');
+	            console.log(gameData);
+	            var board = gameData.board;
+	            var currentColor = gameData.currentColor;
+
+
+	            this.setState({
+	                board: board,
+	                currentColor: currentColor
+	            });
+	        }
+	    }, {
 	        key: 'handleDlgClose',
 	        value: function handleDlgClose() {
 	            this.setState({ dlgOpen: false });
@@ -24870,6 +24887,7 @@
 	            var _state = this.state;
 	            var players = _state.players;
 	            var watchers = _state.watchers;
+	            var currentColor = _state.currentColor;
 
 	            var socketId = this.socket.id;
 	            var playerIndex = players.findIndex(function (player) {
@@ -24885,7 +24903,8 @@
 	                    name: '',
 	                    isPlayer: false,
 	                    isWatcher: false,
-	                    isWaiting: false
+	                    isWaiting: false,
+	                    canMove: false
 	                };
 	            }
 
@@ -24897,7 +24916,8 @@
 	                    name: player.name,
 	                    isPlayer: true,
 	                    isWatcher: false,
-	                    isWaiting: players.length === 1
+	                    isWaiting: players.length === 1,
+	                    canMove: player.color === currentColor
 	                };
 	            } else {
 	                var watcher = watchers[watcherIndex];
@@ -24907,7 +24927,8 @@
 	                    name: watcher.name,
 	                    isPlayer: false,
 	                    isWatcher: true,
-	                    isWaiting: false
+	                    isWaiting: false,
+	                    canMove: false
 	                };
 	            }
 	        }
@@ -24926,6 +24947,8 @@
 	            var title = _state2.title;
 	            var players = _state2.players;
 	            var watchers = _state2.watchers;
+	            var board = _state2.board;
+	            var currentColor = _state2.currentColor;
 
 
 	            var actions = [_react2.default.createElement(_flatButton2.default, {
@@ -24940,7 +24963,8 @@
 	                    emit: _this2.emit.bind(_this2),
 	                    players: players,
 	                    watchers: watchers,
-	                    user: _this2.getCurrentUser()
+	                    user: _this2.getCurrentUser(),
+	                    board: board
 	                });
 	            });
 
@@ -67136,7 +67160,7 @@
 
 
 	// module
-	exports.push([module.id, ".home-container {\n    margin: 0 auto;\n    overflow: hidden;\n    width: 256px;\n}\n\n.home-container .options {\n    margin-top: 20px;\n}", ""]);
+	exports.push([module.id, ".home-container {\n    margin: 0 auto;\n    overflow: hidden;\n    padding-top: 50px;\n    width: 256px;\n}\n\n.home-container .options {\n    margin-top: 20px;\n}", ""]);
 
 	// exports
 
@@ -67159,9 +67183,15 @@
 
 	var _reactRouter = __webpack_require__(159);
 
+	var _cropFree = __webpack_require__(497);
+
+	var _cropFree2 = _interopRequireDefault(_cropFree);
+
 	var _classnames = __webpack_require__(493);
 
 	var _classnames2 = _interopRequireDefault(_classnames);
+
+	__webpack_require__(498);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -67171,6 +67201,11 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	var BOARD_SIZE = 15;
+	var CELL_SIZE = 29;
+	var ICON_SIZE = 24;
+	var CHESS_SIZE = 28;
+
 	var Game = function (_Component) {
 	    _inherits(Game, _Component);
 
@@ -67179,7 +67214,11 @@
 
 	        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Game).call(this, props));
 
-	        _this.state = {};
+	        _this.state = {
+	            targetX: 0,
+	            targetY: 0,
+	            isTargetHidden: true
+	        };
 	        return _this;
 	    }
 
@@ -67206,12 +67245,110 @@
 	            }
 	        }
 	    }, {
+	        key: 'getTargetPosition',
+	        value: function getTargetPosition(e) {
+	            var rect = e.target.getBoundingClientRect();
+
+	            var targetX = e.clientX - rect.left;
+	            var targetY = e.clientY - rect.top;
+
+	            // Snapping
+	            targetX = Math.round(targetX / CELL_SIZE) * CELL_SIZE;
+	            targetY = Math.round(targetY / CELL_SIZE) * CELL_SIZE;
+
+	            return { targetX: targetX, targetY: targetY };
+	        }
+	    }, {
+	        key: 'onMouseMove',
+	        value: function onMouseMove(e) {
+	            var _getTargetPosition = this.getTargetPosition(e);
+
+	            var targetX = _getTargetPosition.targetX;
+	            var targetY = _getTargetPosition.targetY;
+
+
+	            targetX -= ICON_SIZE / 2;
+	            targetY -= ICON_SIZE / 2;
+
+	            this.setState({ targetX: targetX, targetY: targetY, isTargetHidden: false });
+	        }
+	    }, {
+	        key: 'onClick',
+	        value: function onClick(e) {
+	            var _props = this.props;
+	            var emit = _props.emit;
+	            var user = _props.user;
+
+	            var _getTargetPosition2 = this.getTargetPosition(e);
+
+	            var targetX = _getTargetPosition2.targetX;
+	            var targetY = _getTargetPosition2.targetY;
+
+
+	            console.log(targetX / CELL_SIZE, targetY / CELL_SIZE);
+
+	            if (emit) {
+	                emit('move', {
+	                    row: targetY / CELL_SIZE,
+	                    col: targetX / CELL_SIZE,
+	                    color: user.color
+	                });
+	            }
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
+	            var _props2 = this.props;
+	            var user = _props2.user;
+	            var board = _props2.board;
+	            var _state = this.state;
+	            var targetX = _state.targetX;
+	            var targetY = _state.targetY;
+	            var isTargetHidden = _state.isTargetHidden;
+
+	            var targetClassName = (0, _classnames2.default)('target', { hidden: isTargetHidden });
+	            var targetStyle = { left: targetX, top: targetY };
+
+	            var chesses = [];
+
+	            for (var i = 0; i < board.length; i++) {
+	                for (var j = 0; j < board[i].length; j++) {
+	                    if (board[i][j] > -1) {
+	                        var chessClassName = 'chess chess-' + (board[i][j] === 0 ? 'black' : 'white');
+	                        var chessStyle = { left: j * CELL_SIZE - CHESS_SIZE / 2, top: i * CELL_SIZE - CHESS_SIZE / 2, width: CHESS_SIZE, height: CHESS_SIZE };
+	                        var key = i * BOARD_SIZE + j;
+
+	                        chesses.push(_react2.default.createElement('div', { className: chessClassName, style: chessStyle, key: key }));
+	                    }
+	                }
+	            }
+
 	            return _react2.default.createElement(
 	                'div',
-	                null,
-	                'Game'
+	                { className: 'game-container' },
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: 'game-board' },
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'grid' },
+	                        user.canMove && _react2.default.createElement(
+	                            'div',
+	                            { className: targetClassName, style: targetStyle },
+	                            _react2.default.createElement(_cropFree2.default, null)
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: 'chess-container' },
+	                        chesses
+	                    ),
+	                    user.canMove && _react2.default.createElement('div', {
+	                        className: 'grid-overlay',
+	                        onMouseMove: this.onMouseMove.bind(this),
+	                        onClick: this.onClick.bind(this)
+	                    })
+	                )
 	            );
 	        }
 	    }]);
@@ -67219,7 +67356,109 @@
 	    return Game;
 	}(_react.Component);
 
+	Game.propTypes = {
+	    emit: _react.PropTypes.func,
+	    players: _react.PropTypes.array,
+	    watchers: _react.PropTypes.array,
+	    user: _react.PropTypes.object,
+	    board: _react.PropTypes.array,
+	    currentColor: _react.PropTypes.number
+	};
+
+	Game.defaultProps = {
+	    socketId: '',
+	    players: [],
+	    watchers: [],
+	    board: [],
+	    currentColor: 0
+	};
+
 	exports.default = Game;
+
+/***/ },
+/* 497 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _react = __webpack_require__(1);
+
+	var _react2 = _interopRequireDefault(_react);
+
+	var _reactAddonsPureRenderMixin = __webpack_require__(306);
+
+	var _reactAddonsPureRenderMixin2 = _interopRequireDefault(_reactAddonsPureRenderMixin);
+
+	var _svgIcon = __webpack_require__(353);
+
+	var _svgIcon2 = _interopRequireDefault(_svgIcon);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var ImageCropFree = _react2.default.createClass({
+	  displayName: 'ImageCropFree',
+
+	  mixins: [_reactAddonsPureRenderMixin2.default],
+
+	  render: function render() {
+	    return _react2.default.createElement(
+	      _svgIcon2.default,
+	      this.props,
+	      _react2.default.createElement('path', { d: 'M3 5v4h2V5h4V3H5c-1.1 0-2 .9-2 2zm2 10H3v4c0 1.1.9 2 2 2h4v-2H5v-4zm14 4h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4zm0-16h-4v2h4v4h2V5c0-1.1-.9-2-2-2z' })
+	    );
+	  }
+	});
+
+	exports.default = ImageCropFree;
+	module.exports = exports['default'];
+
+/***/ },
+/* 498 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(499);
+	if (typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(491)(content, {});
+	if (content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if (false) {
+		// When the styles change, update the <style> tags
+		if (!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./game.css", function () {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./game.css");
+				if (typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function () {
+			update();
+		});
+	}
+
+/***/ },
+/* 499 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(490)();
+	// imports
+
+
+	// module
+	exports.push([module.id, ".game-container {\n    margin: 0 auto;\n    width: 600px;\n    height: 600px;\n    padding-top: 50px;\n}\n\n.game-board {\n    position: relative;\n}\n\n.game-board .grid {\n    width: 407px;\n    height: 407px;\n    background-image: repeating-linear-gradient(0deg, transparent, transparent 28px, #CCC 28px, #CCC 29px), repeating-linear-gradient(-90deg, transparent, transparent 28px,#CCC 28px, #CCC 29px);\n    background-size: 29px 29px;\n    position: absolute;\n}\n\n.game-board .grid .target {\n    position: absolute;\n    transition-property: top, left;\n    transition-duration: 0.15s;\n}\n\n.game-board .grid-overlay {\n    position: absolute;\n    width: 407px;\n    height: 407px;\n    background: transparent;\n}\n\n.game-board .chess-container {\n    position: absolute;\n    width: 407px;\n    height: 407px;\n    background: transparent;\n}\n\n.game-board .chess-container .chess {\n    position: absolute;\n    border: 1px solid #000000;\n    border-radius: 50%;\n}\n\n.chess-black {\n    background-color: #000000;\n}\n\n.chess-white {\n    background-color: #FFFFFF;\n}", ""]);
+
+	// exports
+
 
 /***/ }
 /******/ ]);
