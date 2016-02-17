@@ -100,7 +100,7 @@ class Home extends Component {
 
                 { user.isWaiting && 
                 <div className='loading-info'>
-                    <CircularProgress />
+                    <CircularProgress size={0.5} />
                     <p>Waiting for a challenger...</p>
                 </div>
                 }
