@@ -8,3 +8,49 @@
 .home-container .options {
     margin-top: 20px;
 }
+
+.chess-option-tip {
+    color: #B3B3B3;
+}
+
+.black-chess-btn {
+    width: 56px;
+    height: 56px;
+    background-color: #000000;
+    border: 1px solid #000000;
+    border-radius: 50%;
+    margin: 15px;
+}
+
+.black-chess-btn:focus {
+    outline: none;
+}
+
+.black-chess-btn:disabled {
+    border: 1px solid #CCCCCC;
+    background-color: #CCCCCC;
+}
+
+.white-chess-btn {
+    width: 56px;
+    height: 56px;
+    background-color: #FFFFFF;
+    border: 1px solid #CCCCCC;
+    border-radius: 50%;
+    margin: 15px;
+}
+
+.white-chess-btn:focus {
+    outline: none;
+}
+
+.white-chess-btn:disabled {
+    border: 1px solid #CCCCCC;
+    background-color: #CCCCCC;
+}
+
+.loading-info {
+    display: flex;
+    align-items: center;
+}
+

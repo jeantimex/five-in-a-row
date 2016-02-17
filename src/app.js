@@ -33,7 +33,9 @@ class App extends Component {
             players: [],
             watchers: [],
             board: [],
-            currentColor: 0
+            currentColor: 0,
+            lastRow: -1,
+            lastCol: -1
         };
 
         // Needed for onTouchTap
@@ -103,12 +105,14 @@ class App extends Component {
     updateGame(gameData) {
         console.log('update game data');
         console.log(gameData);
-        const { board, currentColor, isFinished } = gameData;
+        const { board, currentColor, isFinished, lastRow, lastCol } = gameData;
 
         this.setState({
             board,
             currentColor,
-            isFinished
+            isFinished,
+            lastRow,
+            lastCol
         });
     }
 
@@ -184,7 +188,7 @@ class App extends Component {
 
     render() {
         const { children } = this.props;
-        const { title, players, watchers, board, isFinished } = this.state;
+        const { title, players, watchers, board, isFinished, lastRow, lastCol } = this.state;
 
         const actions = [
             <FlatButton
@@ -202,7 +206,9 @@ class App extends Component {
                 players,
                 watchers,
                 board,
-                isFinished
+                isFinished,
+                lastRow,
+                lastCol
             });
         });
 

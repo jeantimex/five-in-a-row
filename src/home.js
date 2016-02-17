@@ -99,26 +99,24 @@ class Home extends Component {
                 }
 
                 { user.isWaiting && 
-                <div>
-                    <p>Waiting for a challenger...</p>
+                <div className='loading-info'>
                     <CircularProgress />
+                    <p>Waiting for a challenger...</p>
                 </div>
                 }
 
                 {/* Select chess piece color */}
                 <div className={ chessOptionClassName }>
-                    <p>Pick your chess piece color:</p>
-                    <FloatingActionButton
-                        backgroundColor='black'
-                        style={ buttonStyle }
-                        onMouseDown={ this.join.bind(this, 0) }
-                        disabled={ isBlackPicked }
+                    <p className='chess-option-tip'>Pick your chess piece color:</p>
+                    <button 
+                        className='black-chess-btn'
+                        disabled={ isBlackPicked } 
+                        onClick={ this.join.bind(this, 0) }
                     />
-                    <FloatingActionButton
-                        backgroundColor='white'
-                        style={ buttonStyle }
-                        onMouseDown={ this.join.bind(this, 1) }
-                        disabled={ isWhitePicked }
+                    <button 
+                        className='white-chess-btn'
+                        disabled={ isWhitePicked } 
+                        onClick={ this.join.bind(this, 1) }
                     />
                 </div>
                 

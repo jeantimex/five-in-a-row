@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from  'react';
 import { browserHistory } from 'react-router';
 import TargetIcon from 'material-ui/lib/svg-icons/image/crop-free';
 import RaisedButton from 'material-ui/lib/raised-button';
+import Colors from 'material-ui/lib/styles/colors';
 
 import cx from 'classnames';
 
@@ -88,7 +89,7 @@ class Game extends Component {
     }
 
     render() {
-        const { user, board, isFinished } = this.props;
+        const { user, players, watchers, board, isFinished, lastRow, lastCol } = this.props;
         const { targetX, targetY, isTargetHidden } = this.state;
         const targetStyle = { left: targetX, top: targetY };
 
@@ -98,6 +99,9 @@ class Game extends Component {
             for (let j = 0; j < board[i].length; j++) {
                 if (board[i][j] > -1) {
                     let chessClassName = 'chess chess-' + (board[i][j] === 0 ? 'black' : 'white');
+                    if (i === lastRow && j === lastCol) {
+                        chessClassName += ' last';
+                    }
                     let chessStyle = { left: j * CELL_SIZE - CHESS_SIZE / 2, top: i * CELL_SIZE - CHESS_SIZE / 2, width: CHESS_SIZE, height: CHESS_SIZE };
                     let key = i * BOARD_SIZE + j;
 
@@ -108,41 +112,83 @@ class Game extends Component {
             }
         }
 
+        let playerItems = [];
+
+        for (let i = 0; i < players.length; i++) {
+            const player = players[i];
+            const playerClassName = 'chess-color chess-' + (player.color === 0 ? 'black' : 'white');
+            
+            playerItems.push(
+                <li className='player' key={ i }>
+                    <div className={ playerClassName }></div>
+                    <p className='player-name'>{ player.name }</p>
+                </li>
+            );
+        }
+
+        let wathcerItems = [];
+
+        for (let i = 0; i < watchers.length; i++) {
+            const watcher = watchers[i];
+
+            wathcerItems.push(
+                <li className='watcher' key={ i }>
+                    <p className='watcher-name'>{ watcher.name }</p>
+                </li>
+            );
+        }
+
         return (
             <div className='game-container'>
-                <div className='game-board'>
-                    <div className='grid'>
-                        { !isFinished && user.canMove && 
-                        <div className='target' style={ targetStyle }>
-                            <TargetIcon />
+                <div className='main-pane'>
+                    <div className='left-pane'>
+                        <div className='game-board'>
+                            <div className='grid'></div>
+                            
+                            <div className='point-container'>
+                                <div className='p0'></div>
+                                <div className='p1'></div>
+                                <div className='p2'></div>
+                                <div className='p3'></div>
+                                <div className='p4'></div>
+                            </div>
+                            
+                            <div className='chess-container'>
+                                { chesses }
+                            </div>
+
+                            { !isFinished && user.canMove &&
+                            <div className='target-container'>
+                                <div className='target' style={ targetStyle }>
+                                    <TargetIcon color={Colors.cyan500}/>
+                                </div>
+                            </div>
+                            }
+                            { !isFinished && user.canMove &&
+                            <div
+                                className='grid-overlay'
+                                onMouseMove={ this.onMouseMove.bind(this) }
+                                onClick={ this.onClick.bind(this) }
+                            >
+                            </div>
+                            }
                         </div>
-                        }
                     </div>
-                    <div className='point-container'>
-                        <div className='p0'></div>
-                        <div className='p1'></div>
-                        <div className='p2'></div>
-                        <div className='p3'></div>
-                        <div className='p4'></div>
+                    <div className='right-pane'>
+                        <ul className='players-pane'>
+                            { playerItems }
+                        </ul>
+
+                        <ul className='watchers-pane'>
+                            { wathcerItems }
+                        </ul>
+
+                        <RaisedButton
+                            label='Quit'
+                            secondary={true}
+                            onMouseDown={ this.quit.bind(this) }
+                        />
                     </div>
-                    <div className='chess-container'>
-                        { chesses }
-                    </div>
-                    { !isFinished && user.canMove &&
-                    <div
-                        className='grid-overlay'
-                        onMouseMove={ this.onMouseMove.bind(this) }
-                        onClick={ this.onClick.bind(this) }
-                    >
-                    </div>
-                    }
-                </div>
-                <div className='button-group'>
-                    <RaisedButton
-                        label='Quit'
-                        secondary={true}
-                        onMouseDown={ this.quit.bind(this) }
-                    />
                 </div>
             </div>
         );

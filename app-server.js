@@ -21,6 +21,8 @@ function GameServer() {
     this.board = [];
     this.currentColor = 0;
     this.isFinished = false;
+    this.lastRow = -1;
+    this.lastCol = -1;
 }
 
 GameServer.prototype = {
@@ -29,6 +31,8 @@ GameServer.prototype = {
         this.board = [];
         this.currentColor = 0;
         this.isFinished = false;
+        this.lastRow = -1;
+        this.lastCol = -1;
 
         for (var i = 0; i < BOARD_SIZE; i++) {
             this.board.push([]);
@@ -46,6 +50,8 @@ GameServer.prototype = {
     move: function(row, col, color, playerId) {
         this.board[row][col] = color;
         this.currentColor = 1 - this.currentColor;
+        this.lastRow = row;
+        this.lastCol = col;
     },
 
     isBoardFull: function() {
@@ -177,7 +183,9 @@ GameServer.prototype = {
         return {
             board: this.board,
             currentColor: this.currentColor,
-            isFinished: this.isFinished
+            isFinished: this.isFinished,
+            lastRow: this.lastRow,
+            lastCol: this.lastCol
         };
     },
 

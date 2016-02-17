@@ -1,8 +1,22 @@
 .game-container {
     margin: 0 auto;
-    width: 500px;
+    width: 600px;
     position: relative;
     padding: 40px;
+}
+
+.main-pane {
+    width: 600px;
+    height: 407px;
+}
+
+.left-pane {
+    float: left;
+}
+
+.right-pane {
+    float: left;
+    padding: 10px 20px;
 }
 
 .game-board {
@@ -19,7 +33,7 @@
     position: absolute;
 }
 
-.game-board .grid .target {
+.target {
     position: absolute;
     transition-property: top, left;
     transition-duration: 0.15s;
@@ -96,6 +110,13 @@
     background: transparent;
 }
 
+.game-board .target-container {
+    position: absolute;
+    width: 407px;
+    height: 407px;
+    background: transparent;
+}
+
 .game-board .chess-container .chess {
     position: absolute;
     border: 1px solid #000000;
@@ -106,8 +127,66 @@
     background-color: #000000;
 }
 
+.chess-black.last:after {
+    position: absolute;
+    content: '+';
+    color: #FFFFFF;
+    top: 3px;
+    left: 9px;
+}
+
 .chess-white {
     background-color: #FFFFFF;
+}
+
+.chess-white.last:after {
+    position: absolute;
+    content: '+';
+    color: #000000;
+    top: 3px;
+    left: 9px;
+}
+
+ul {
+    list-style: none;
+}
+
+ul.players-pane {
+    height: 68px;
+}
+
+li.player {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+}
+
+.chess-color {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #000000;
+    border-radius: 50%;
+}
+
+.player-name {
+    margin-left: 10px;
+}
+
+.watchers-pane {
+    margin: 10px 0px;
+    height: 260px;
+    border-top: 1px solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;
+}
+
+li.watcher {
+    margin-top: 4px;
+    padding-left: 10px;
+}
+
+.watcher-name {
+    font-size: 12px;
+    color: #333333;
 }
 
 .button-group {
