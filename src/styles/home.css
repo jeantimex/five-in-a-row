@@ -4,7 +4,7 @@
     margin-top: 50px;
     padding-left: 20px;
     width: 256px;
-    border-left: 1px solid #CCCCCC;
+    box-shadow: inset 6px 0px 10px -10px;
 }
 
 .home-container .options {
