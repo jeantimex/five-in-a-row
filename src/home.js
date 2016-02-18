@@ -8,6 +8,7 @@ import IconButton from 'material-ui/lib/icon-button';
 import FloatingActionButton from 'material-ui/lib/floating-action-button';
 import RaisedButton from 'material-ui/lib/raised-button';
 import CircularProgress from 'material-ui/lib/circular-progress';
+import PeopleIcon from 'material-ui/lib/svg-icons/social/people';
 
 import './styles/home.css';
 
@@ -38,7 +39,7 @@ class Home extends Component {
         const { players, user } = props;
 
         if (players.length >= 2 && (user.isPlayer || user.isWatcher)) {
-            browserHistory.push('/game');
+            browserHistory.push('game');
         }
     }
 
@@ -73,7 +74,7 @@ class Home extends Component {
     }
 
     render() {
-        const { players, user } = this.props;
+        const { players, user, onlineCnt } = this.props;
         const { errorText } = this.state;
 
         const chessOptionClassName = cx('options', {
@@ -109,12 +110,12 @@ class Home extends Component {
                 <div className={ chessOptionClassName }>
                     <p className='chess-option-tip'>Pick your chess piece color:</p>
                     <button 
-                        className='black-chess-btn'
+                        className='chess-btn chess-black'
                         disabled={ isBlackPicked } 
                         onClick={ this.join.bind(this, 0) }
                     />
                     <button 
-                        className='white-chess-btn'
+                        className='chess-btn chess-white'
                         disabled={ isWhitePicked } 
                         onClick={ this.join.bind(this, 1) }
                     />
@@ -130,6 +131,11 @@ class Home extends Component {
                         onMouseDown={ this.join.bind(this, -1) }
                     />
                 </div>
+
+                <div className='online-status'>
+                    <PeopleIcon size={ 0.4 } />
+                    <p>{ onlineCnt } people online</p>
+                </div>
             </div>
         );
     }
@@ -140,13 +146,15 @@ Home.propTypes = {
     emit: PropTypes.func,
     players: PropTypes.array,
     watchers: PropTypes.array,
-    user: PropTypes.object
+    user: PropTypes.object,
+    onlineCnt: PropTypes.number
 };
 
 Home.defaultProps = {
     socketId: '',
     players: [],
-    watchers: []
+    watchers: [],
+    onlineCnt: 0
 };
 
 export default Home;

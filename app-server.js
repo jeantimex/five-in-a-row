@@ -165,7 +165,8 @@ GameServer.prototype = {
     getConnections: function() {
         return {
             players: this.getPlayers(),
-            watchers: this.getWatchers()
+            watchers: this.getWatchers(),
+            onlineCnt: this.connections.length
         };
     },
 

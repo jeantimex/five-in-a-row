@@ -10,7 +10,7 @@ ReactDOM.render((
     <Router history={ browserHistory }>
         <Route path="/" component={ App }>
             <IndexRoute component={ Home } />
-            <Route path="/game" component={ Game } />
+            <Route path="game" component={ Game } />
         </Route>
     </Router>
 ), document.getElementById('react-container'));

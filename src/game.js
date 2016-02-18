@@ -3,6 +3,7 @@ import { browserHistory } from 'react-router';
 import TargetIcon from 'material-ui/lib/svg-icons/image/crop-free';
 import RaisedButton from 'material-ui/lib/raised-button';
 import Colors from 'material-ui/lib/styles/colors';
+import PeopleIcon from 'material-ui/lib/svg-icons/social/people';
 
 import cx from 'classnames';
 
@@ -89,7 +90,7 @@ class Game extends Component {
     }
 
     render() {
-        const { user, players, watchers, board, isFinished, lastRow, lastCol } = this.props;
+        const { user, players, watchers, board, isFinished, lastRow, lastCol, onlineCnt } = this.props;
         const { targetX, targetY, isTargetHidden } = this.state;
         const targetStyle = { left: targetX, top: targetY };
 
@@ -190,6 +191,11 @@ class Game extends Component {
                         />
                     </div>
                 </div>
+
+                <div className='online-status'>
+                    <PeopleIcon size={ 0.4 } />
+                    <p>{ onlineCnt } people online</p>
+                </div>
             </div>
         );
     }
@@ -204,6 +210,7 @@ Game.propTypes = {
     board: PropTypes.array,
     currentColor: PropTypes.number,
     isFinished: PropTypes.bool,
+    onlineCnt: PropTypes.number
 };
 
 Game.defaultProps = {
@@ -212,7 +219,8 @@ Game.defaultProps = {
     watchers: [],
     board: [],
     currentColor: 0,
-    isFinished: false
+    isFinished: false,
+    onlineCnt: 0
 };
 
 export default Game;

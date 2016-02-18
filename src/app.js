@@ -35,7 +35,8 @@ class App extends Component {
             board: [],
             currentColor: 0,
             lastRow: -1,
-            lastCol: -1
+            lastCol: -1,
+            onlineCnt: 0
         };
 
         // Needed for onTouchTap
@@ -94,11 +95,12 @@ class App extends Component {
     updateConnection(connections) {
         console.log('update connections');
         console.log(connections);
-        const { players, watchers } = connections;
+        const { players, watchers, onlineCnt } = connections;
 
         this.setState({
             players,
-            watchers
+            watchers,
+            onlineCnt
         });
     }
 
@@ -188,7 +190,7 @@ class App extends Component {
 
     render() {
         const { children } = this.props;
-        const { title, players, watchers, board, isFinished, lastRow, lastCol } = this.state;
+        const { title, players, watchers, board, isFinished, lastRow, lastCol, onlineCnt } = this.state;
 
         const actions = [
             <FlatButton
@@ -208,7 +210,8 @@ class App extends Component {
                 board,
                 isFinished,
                 lastRow,
-                lastCol
+                lastCol,
+                onlineCnt
             });
         });
 
